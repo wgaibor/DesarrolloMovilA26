@@ -1,0 +1,51 @@
+package com.simpsonapp.models;
+
+import java.util.List;
+
+public class SimpsonResponse {
+    private int count;
+    private String next;
+    private int prev;
+    private int pages;
+    private List<Characters> results;
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public String getNext() {
+        return next;
+    }
+
+    public void setNext(String next) {
+        this.next = next;
+    }
+
+    public int getPrev() {
+        return prev;
+    }
+
+    public void setPrev(int prev) {
+        this.prev = prev;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
+    }
+
+    public List<Characters> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Characters> results) {
+        this.results = results;
+    }
+}

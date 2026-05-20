@@ -38,8 +38,17 @@ android {
 dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
+    implementation(libs.cardview)
     implementation(libs.constraintlayout)
     implementation(libs.material)
+    implementation(libs.recyclerview)
+    //Retrofit
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    //GSON Converter (for JSON parsing)
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    // OkHttp (Retrofit's underlying HTTP client)
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0") // Optional: for logging network requests
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SimpsonApp</string>
+    <string name="listado_nombre">Listados de personajes</string>
 </resources>
