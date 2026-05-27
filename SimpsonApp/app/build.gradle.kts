@@ -49,6 +49,8 @@ dependencies {
     // OkHttp (Retrofit's underlying HTTP client)
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.0") // Optional: for logging network requests
+    //Librería para imagenes
+    implementation("com.squareup.picasso:picasso:2.8")
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)

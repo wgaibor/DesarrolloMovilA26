@@ -8,9 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.simpsonapp.R;
+import com.simpsonapp.adapter.CharacterAdpater;
 import com.simpsonapp.models.Characters;
 import com.simpsonapp.models.SimpsonResponse;
 import com.simpsonapp.services.SimpsonApiServices;
@@ -26,6 +28,8 @@ public class CharactersActivity extends AppCompatActivity {
     SimpsonApiServices apiServices;
 
     RecyclerView rvCharacters;
+
+    CharacterAdpater characterAdpater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +51,15 @@ public class CharactersActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<SimpsonResponse> call, Throwable t) {
-
+                t.printStackTrace();
             }
         });
     }
 
     private void mostrarMensaje(List<Characters> lstCharacters) {
-        for (Characters personaje:  lstCharacters) {
-            Log.d("Personaje ", personaje.getName());
-        }
+        characterAdpater = new CharacterAdpater(lstCharacters, this);
+        rvCharacters.setHasFixedSize(true);
+        rvCharacters.setLayoutManager(new LinearLayoutManager(this));
+        rvCharacters.setAdapter(characterAdpater);
     }
 }
