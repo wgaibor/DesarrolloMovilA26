@@ -46,6 +46,14 @@ public class CharacterAdpater extends RecyclerView.Adapter<CharacterAdpater.Char
         Picasso.get()
                 .load(urlImgCharacters)
                 .into(holder.imgCharacter);
+        int ageCharacter = objCharacters.getAge();
+        if(ageCharacter > 0) {
+            holder.tvAgeCharacter.setText(objCharacters.getAge()+"");
+            holder.tvAgeCharacter.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvAgeCharacter.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -56,11 +64,13 @@ public class CharacterAdpater extends RecyclerView.Adapter<CharacterAdpater.Char
     static class CharacterViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCharacter;
         TextView tvNameCharacter;
+        TextView tvAgeCharacter;
 
         public CharacterViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCharacter = itemView.findViewById(R.id.img_character);
             tvNameCharacter = itemView.findViewById(R.id.tv_character);
+            tvAgeCharacter = itemView.findViewById(R.id.tv_age);
         }
     }
 }
