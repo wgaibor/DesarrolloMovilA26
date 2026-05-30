@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,7 +60,9 @@ public class CharactersActivity extends AppCompatActivity {
     private void mostrarMensaje(List<Characters> lstCharacters) {
         characterAdpater = new CharacterAdpater(lstCharacters, this);
         rvCharacters.setHasFixedSize(true);
-        rvCharacters.setLayoutManager(new LinearLayoutManager(this));
+        //rvCharacters.setLayoutManager(new LinearLayoutManager(this));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        rvCharacters.setLayoutManager(gridLayoutManager);
         rvCharacters.setAdapter(characterAdpater);
     }
 }

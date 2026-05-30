@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.simpsonapp.R;
@@ -53,7 +54,19 @@ public class CharacterAdpater extends RecyclerView.Adapter<CharacterAdpater.Char
         } else {
             holder.tvAgeCharacter.setVisibility(View.GONE);
         }
+        holder.tvOcuppation.setText(objCharacters.getOccupation());
+        if(objCharacters.getStatus().equalsIgnoreCase("Deceased")){
+            holder.tvStatus.setBackground(
+                    ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.rectangle_status_deceased_textview) );
+        } else {
+            holder.tvStatus.setBackground(
+                    ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.rectangle_status_alive_textview) );
+        }
+        holder.tvStatus.setText(objCharacters.getStatus());
 
+        String[] phrases = objCharacters.getPhrases();
+        String firstPhrase = (phrases != null && phrases.length > 0) ? phrases[0] : "Sin frase";
+        holder.tvPhrase.setText(firstPhrase);
     }
 
     @Override
@@ -65,12 +78,18 @@ public class CharacterAdpater extends RecyclerView.Adapter<CharacterAdpater.Char
         ImageView imgCharacter;
         TextView tvNameCharacter;
         TextView tvAgeCharacter;
+        TextView tvOcuppation;
+        TextView tvStatus;
+        TextView tvPhrase;
 
         public CharacterViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCharacter = itemView.findViewById(R.id.img_character);
             tvNameCharacter = itemView.findViewById(R.id.tv_character);
             tvAgeCharacter = itemView.findViewById(R.id.tv_age);
+            tvOcuppation = itemView.findViewById(R.id.tv_occupation);
+            tvStatus = itemView.findViewById(R.id.tv_status);
+            tvPhrase = itemView.findViewById(R.id.tv_phrase);
         }
     }
 }
