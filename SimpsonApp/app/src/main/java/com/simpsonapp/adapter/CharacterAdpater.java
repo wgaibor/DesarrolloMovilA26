@@ -74,6 +74,12 @@ public class CharacterAdpater extends RecyclerView.Adapter<CharacterAdpater.Char
         return lstCharacters.size();
     }
 
+    public void addCharacterNew(List<Characters> lstCharacter) {
+        int initialPosition = lstCharacters.size();
+        lstCharacters.addAll(lstCharacter);
+        notifyItemRangeInserted(initialPosition, lstCharacters.size());
+    }
+
     static class CharacterViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCharacter;
         TextView tvNameCharacter;

@@ -5,7 +5,7 @@ import java.util.List;
 public class SimpsonResponse {
     private int count;
     private String next;
-    private int prev;
+    private String prev;
     private int pages;
     private List<Characters> results;
 
@@ -25,11 +25,11 @@ public class SimpsonResponse {
         this.next = next;
     }
 
-    public int getPrev() {
+    public String getPrev() {
         return prev;
     }
 
-    public void setPrev(int prev) {
+    public void setPrev(String prev) {
         this.prev = prev;
     }
 

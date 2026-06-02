@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -18,6 +19,7 @@ import com.simpsonapp.models.Characters;
 import com.simpsonapp.models.SimpsonResponse;
 import com.simpsonapp.services.SimpsonApiServices;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -32,36 +34,78 @@ public class CharactersActivity extends AppCompatActivity {
 
     CharacterAdpater characterAdpater;
 
+    GridLayoutManager gridLayoutManager;
+
+    int pageRecently = 1;
+
+    boolean isLoading = false;
+
+    List<Characters> lstCharacter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_characters);
         rvCharacters = findViewById(R.id.rv_character);
-        cargarInformacion();
+        gridLayoutManager = new GridLayoutManager(this, 2);
+        lstCharacter = new ArrayList<>();
+        fillRecyclerView(lstCharacter);
+        settingScrollListener();
+        callCharacterSimpsons(pageRecently);
     }
 
-    private void cargarInformacion() {
+    private void settingScrollListener() {
+        rvCharacters.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int totalItems = gridLayoutManager.getItemCount();
+                int lastItemVisible = gridLayoutManager.findLastVisibleItemPosition();
+                // Si estamos cerca del final del recyclerview ('ultimos 5 elementos) y no este consumiendo ws
+                if (!isLoading && lastItemVisible >= totalItems - 5) {
+                    loadNextItems();
+                    Log.i("Pagina actual", pageRecently+"");
+                }
+            }
+        });
+    }
+
+    private void loadNextItems() {
+        if (!isLoading) {
+            pageRecently++;
+            callCharacterSimpsons(pageRecently);
+        }
+    }
+
+    private void callCharacterSimpsons(int pageRecently) {
         apiServices = SimpsonApiServices.getInstance();
-        apiServices.getApi().getPersonajeSimpson().enqueue(new Callback<SimpsonResponse>() {
+        isLoading = true;
+        apiServices.getApi().getPersonajeSimpsonByPage(pageRecently).enqueue(new Callback<SimpsonResponse>() {
             @Override
             public void onResponse(Call<SimpsonResponse> call, Response<SimpsonResponse> response) {
+                isLoading = false;
                 if (response.isSuccessful() && response.body() != null) {
-                    mostrarMensaje(response.body().getResults());
+                    List<Characters> lstCharacter = response.body().getResults();
+                    if (pageRecently == 1) {
+                        fillRecyclerView(lstCharacter);
+                    } else {
+                        characterAdpater.addCharacterNew(lstCharacter);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<SimpsonResponse> call, Throwable t) {
+                isLoading = false;
                 t.printStackTrace();
             }
         });
     }
 
-    private void mostrarMensaje(List<Characters> lstCharacters) {
+
+    private void fillRecyclerView(List<Characters> lstCharacters) {
         characterAdpater = new CharacterAdpater(lstCharacters, this);
         rvCharacters.setHasFixedSize(true);
-        //rvCharacters.setLayoutManager(new LinearLayoutManager(this));
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvCharacters.setLayoutManager(gridLayoutManager);
         rvCharacters.setAdapter(characterAdpater);
     }

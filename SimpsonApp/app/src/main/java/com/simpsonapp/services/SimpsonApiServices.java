@@ -6,6 +6,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public class SimpsonApiServices {
 
@@ -38,5 +39,8 @@ public class SimpsonApiServices {
 
         @GET("characters")
         Call<SimpsonResponse> getPersonajeSimpson();
+
+        @GET("characters")
+        Call<SimpsonResponse> getPersonajeSimpsonByPage(@Query("page") int page);
     }
 }
