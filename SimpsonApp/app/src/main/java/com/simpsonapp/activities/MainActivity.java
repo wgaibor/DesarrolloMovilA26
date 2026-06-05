@@ -93,8 +93,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (user.equalsIgnoreCase("wgaibor") && pass.equalsIgnoreCase("123")) {
             Intent intento = new Intent(this, CharactersActivity.class);
             startActivity(intento);
+            finish();
         } else {
             Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_LONG).show();
         }
+        clearTextField();
+    }
+
+    private void clearTextField() {
+        txtUser.setText("");
+        txtPass.setText("");
     }
 }
