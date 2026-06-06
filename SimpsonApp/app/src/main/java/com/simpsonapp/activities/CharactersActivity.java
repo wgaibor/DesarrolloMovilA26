@@ -1,11 +1,16 @@
 package com.simpsonapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -18,6 +23,7 @@ import com.simpsonapp.adapter.CharacterAdpater;
 import com.simpsonapp.models.Characters;
 import com.simpsonapp.models.SimpsonResponse;
 import com.simpsonapp.services.SimpsonApiServices;
+import com.simpsonapp.util.SharedPreferencesManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +48,19 @@ public class CharactersActivity extends AppCompatActivity {
 
     List<Characters> lstCharacter;
 
+    Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_characters);
         rvCharacters = findViewById(R.id.rv_character);
+        toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
         gridLayoutManager = new GridLayoutManager(this, 2);
         lstCharacter = new ArrayList<>();
         fillRecyclerView(lstCharacter);
@@ -108,5 +122,28 @@ public class CharactersActivity extends AppCompatActivity {
         rvCharacters.setHasFixedSize(true);
         rvCharacters.setLayoutManager(gridLayoutManager);
         rvCharacters.setAdapter(characterAdpater);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_logout) {
+            logoutSession();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutSession() {
+        SharedPreferencesManager.setValorBoolean(this, "SimpsonPreferences", false, "isLogin");
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

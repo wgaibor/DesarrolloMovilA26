@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.simpsonapp.R;
+import com.simpsonapp.util.SharedPreferencesManager;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tilUser = findViewById(R.id.til_user);
         tilPass = findViewById(R.id.til_pass);
         btnLogin.setOnClickListener(this);
+        boolean isLoginNow = SharedPreferencesManager.getValorEsperadoBoolean(this, "SimpsonPreferences", "isLogin");
+        if (isLoginNow) {
+            callNextActivity();
+        }
         txtUser.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -72,6 +77,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    private void callNextActivity() {
+        Intent intento = new Intent(this, CharactersActivity.class);
+        startActivity(intento);
+        finish();
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_enter) {
@@ -91,9 +102,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void validateUser(String user, String pass) {
         if (user.equalsIgnoreCase("wgaibor") && pass.equalsIgnoreCase("123")) {
-            Intent intento = new Intent(this, CharactersActivity.class);
-            startActivity(intento);
-            finish();
+            SharedPreferencesManager.setValorBoolean(this, "SimpsonPreferences", true, "isLogin");
+            callNextActivity();
         } else {
             Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_LONG).show();
         }
