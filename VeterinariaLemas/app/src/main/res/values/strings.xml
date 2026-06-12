@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">VeterinariaLemas</string>
+    <string name="enter_user">Ingrese usuario</string>
+    <string name="enter_pass">Ingrese contrasena</string>
+    <string name="create_user">Crear usuario</string>
+    <string name="login">Ingresar</string>
+    <string name="save">Guardar</string>
+</resources>
