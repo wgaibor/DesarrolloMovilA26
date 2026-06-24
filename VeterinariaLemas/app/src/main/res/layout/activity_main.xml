@@ -50,6 +50,7 @@
         android:text="@string/create_user"/>
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_ingresar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

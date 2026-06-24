@@ -6,4 +6,7 @@
     </style>
 
     <style name="Theme.VeterinariaLemas" parent="Base.Theme.VeterinariaLemas" />
+
+    <style name="Theme.VeterinariaLemas.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.VeterinariaLemas.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

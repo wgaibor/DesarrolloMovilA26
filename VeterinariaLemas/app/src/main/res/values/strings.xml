@@ -5,4 +5,11 @@
     <string name="create_user">Crear usuario</string>
     <string name="login">Ingresar</string>
     <string name="save">Guardar</string>
+    <string name="medic_assistant">Asistencia medica</string>
+    <string name="barber">Peluqueria</string>
+    <string name="food">Comida</string>
+    <string name="navigation_drawer_open">Abrir menu de navegacion</string>
+    <string name="navigation_drawer_close">Cerrar menu de navegacion</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
