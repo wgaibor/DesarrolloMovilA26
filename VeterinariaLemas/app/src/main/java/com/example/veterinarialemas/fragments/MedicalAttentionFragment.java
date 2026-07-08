@@ -1,66 +1,303 @@
 package com.example.veterinarialemas.fragments;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
 import com.example.veterinarialemas.R;
+import com.example.veterinarialemas.models.AsistenciaMedicaModels;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MedicalAttentionFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class MedicalAttentionFragment extends Fragment {
+import java.io.IOException;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class MedicalAttentionFragment extends Fragment implements View.OnClickListener {
 
-    public MedicalAttentionFragment() {
-        // Required empty public constructor
-    }
+    TextInputEditText tieDuenio;
+    TextInputEditText tieNombreMascota;
+    AutoCompleteTextView actTipoMascota;
+    TextInputEditText tieRazaMascota;
+    TextInputEditText tieEdadMascota;
+    MaterialButton btnGuardarMascota;
+    CircularProgressIndicator loadingProgressIndicator;
+    TextInputLayout tilDuenio;
+    TextInputLayout tilNombreMascota;
+    TextInputLayout tilTipoMascota;
+    TextInputLayout tilRazaMascota;
+    TextInputLayout tilEdadMascota;
+    ImageView imgCapturaImagen;
+    ActivityResultLauncher<Intent> imagePickerLauncher;
+    Uri imageUri;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MedicalAttentionFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MedicalAttentionFragment newInstance(String param1, String param2) {
-        MedicalAttentionFragment fragment = new MedicalAttentionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    String[] arregloMascotas = {"Perro", "Gato", "Conejo", "Hamster", "Loro", "Caballo"};
+
+    FirebaseFirestore db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_medical_attention, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        tieDuenio = view.findViewById(R.id.tie_duenio);
+        tieNombreMascota = view.findViewById(R.id.tie_mascota);
+        actTipoMascota = view.findViewById(R.id.act_tipo_mascota);
+        tieRazaMascota = view.findViewById(R.id.tie_raza_mascota);
+        tieEdadMascota = view.findViewById(R.id.tie_edad_mascota);
+        btnGuardarMascota = view.findViewById(R.id.btn_guardar_mascota);
+        loadingProgressIndicator = view.findViewById(R.id.loading_progressBar);
+        tilDuenio = view.findViewById(R.id.til_duenio);
+        tilNombreMascota = view.findViewById(R.id.til_mascota);
+        tilTipoMascota = view.findViewById(R.id.til_tipo_mascota);
+        tilRazaMascota = view.findViewById(R.id.til_raza_mascota);
+        tilEdadMascota = view.findViewById(R.id.til_edad_mascota);
+        imgCapturaImagen = view.findViewById(R.id.img_capture_file);
+        btnGuardarMascota.setOnClickListener(this);
+        imgCapturaImagen.setOnClickListener(this);
+
+        imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                                                        resultado -> {
+                                                            if (resultado.getData() != null && resultado.getData().getData() != null) {
+                                                                imageUri = resultado.getData().getData();
+                                                                showImagePreview();
+                                                            }
+                                                        });
+
+        cleanValuesWithError();
+
+        ArrayAdapter<String> listadoMascota = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, arregloMascotas);
+        actTipoMascota.setAdapter(listadoMascota);
+
+        db = FirebaseFirestore.getInstance();
+    }
+
+
+
+    private void showImagePreview() {
+        if(imageUri != null) {
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(),
+                                                                    imageUri);
+                Glide.with(this).load(bitmap).into(imgCapturaImagen);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.btn_guardar_mascota) {
+            savePets();
+        } else if (v.getId() == R.id.img_capture_file) {
+            openFileSystem();
+        }
+    }
+
+    private void openFileSystem() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(Intent.createChooser(intent, "Selecciona la imagen"));
+    }
+
+    private void savePets() {
+        tilDuenio.setError(null);
+        tilNombreMascota.setError(null);
+        tilTipoMascota.setError(null);
+        tilRazaMascota.setError(null);
+        tilEdadMascota.setError(null);
+        btnGuardarMascota.setVisibility(View.GONE);
+        loadingProgressIndicator.setVisibility(View.VISIBLE);
+
+        String nameHosts = tieDuenio.getText().toString();
+        String namePets = tieNombreMascota.getText().toString();
+        String typePets = actTipoMascota.getText().toString();
+        String razaPets = tieRazaMascota.getText().toString();
+        String agePets = tieEdadMascota.getText().toString();
+        boolean isFieldFull = validateFieldsNulls(nameHosts,
+                                                    namePets,
+                                                    typePets,
+                                                    razaPets,
+                                                    agePets);
+        if (!isFieldFull) {
+            btnGuardarMascota.setVisibility(View.VISIBLE);
+            loadingProgressIndicator.setVisibility(View.GONE);
+            return;
+        }
+        AsistenciaMedicaModels asistencia = new AsistenciaMedicaModels(nameHosts,
+                                                                        namePets,
+                                                                        typePets,
+                                                                        razaPets,
+                                                                        agePets);
+
+        db.collection("PACIENTES")
+                .add(asistencia)
+                .addOnCompleteListener(exitoso -> {
+                    btnGuardarMascota.setVisibility(View.VISIBLE);
+                    loadingProgressIndicator.setVisibility(View.GONE);
+                    if(exitoso.isSuccessful()) {
+                        Toast.makeText(getContext(), "Se ha guardado la informacion", Toast.LENGTH_LONG).show();
+                        cleanFieldValue();
+                    } else {
+                        Toast.makeText(getContext(), "NO se ha guardado la informacion", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener( error -> {
+                    error.printStackTrace();
+                    btnGuardarMascota.setVisibility(View.VISIBLE);
+                    loadingProgressIndicator.setVisibility(View.GONE);
+                });
+    }
+
+    private boolean validateFieldsNulls(String nameHosts, String namePets, String typePets, String razaPets, String agePets) {
+        if (nameHosts.isEmpty()) {
+            tilDuenio.setError("El campo duenio es obligatorio");
+            return false;
+        } else if (namePets.isEmpty()) {
+            tilNombreMascota.setError("El campo nombre es obligatorio");
+            return false;
+        } else if (typePets.isEmpty()) {
+            tilTipoMascota.setError("No ha seleccionado el tipo de mascota");
+            return false;
+        } else if (razaPets.isEmpty()) {
+            tilRazaMascota.setError("El campo raza es obligatorio");
+            return false;
+        } else if (agePets.isEmpty()) {
+            tilEdadMascota.setError("El campo edad es obligatorio");
+            return false;
+        }
+        return true;
+    }
+
+
+    private void cleanFieldValue() {
+        tieDuenio.setText("");
+        tieNombreMascota.setText("");
+        actTipoMascota.setText("");
+        tieRazaMascota.setText("");
+        tieEdadMascota.setText("");
+    }
+
+    private void cleanValuesWithError() {
+        tieDuenio.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (tilDuenio.getError() != null) {
+                    tilDuenio.setError(null);
+                }
+            }
+        });
+
+        tieNombreMascota.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (tilNombreMascota.getError() != null) {
+                    tilNombreMascota.setError(null);
+                }
+            }
+        });
+
+        actTipoMascota.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (tilTipoMascota.getError() != null) {
+                    tilTipoMascota.setError(null);
+                }
+            }
+        });
+
+        tieRazaMascota.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(tilRazaMascota.getError() != null) {
+                    tilRazaMascota.setError(null);
+                }
+            }
+        });
+
+        tieEdadMascota.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (tilEdadMascota.getError() != null) {
+                    tilEdadMascota.setError(null);
+                }
+            }
+        });
     }
 }

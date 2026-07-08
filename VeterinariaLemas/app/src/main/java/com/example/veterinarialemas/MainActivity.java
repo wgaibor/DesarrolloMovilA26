@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.veterinarialemas.activity.MenuActivity;
+import com.example.veterinarialemas.utils.SharedPreferencesManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -31,6 +32,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        boolean estaLogueado = SharedPreferencesManager.getValorEsperadoBoolean(this, "VETPREFERENCES", "isLogin");
+        if (estaLogueado) {
+            callMenuActivity();
+        }
         tvRegisterUser = findViewById(R.id.txt_create_user);
         tvRegisterUser.setOnClickListener(this);
         tieUser = findViewById(R.id.tie_user);
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
+                            SharedPreferencesManager.setValorBoolean(MainActivity.this, "VETPREFERENCES", true, "isLogin");
                             callMenuActivity();
                         } else {
                             Snackbar.make(MainActivity.this.getCurrentFocus(), "Credenciales incorrecta", Snackbar.LENGTH_LONG).show();
@@ -70,5 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void callMenuActivity() {
         Intent intento = new Intent(this, MenuActivity.class);
         startActivity(intento);
+        finish();
     }
 }
