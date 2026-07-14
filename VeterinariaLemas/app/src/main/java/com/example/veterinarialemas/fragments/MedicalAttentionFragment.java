@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.veterinarialemas.R;
 import com.example.veterinarialemas.models.AsistenciaMedicaModels;
+import com.example.veterinarialemas.utils.ImageUploader;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
@@ -50,6 +51,7 @@ public class MedicalAttentionFragment extends Fragment implements View.OnClickLi
     ImageView imgCapturaImagen;
     ActivityResultLauncher<Intent> imagePickerLauncher;
     Uri imageUri;
+    Bitmap bitmap;
 
 
     String[] arregloMascotas = {"Perro", "Gato", "Conejo", "Hamster", "Loro", "Caballo"};
@@ -102,7 +104,7 @@ public class MedicalAttentionFragment extends Fragment implements View.OnClickLi
     private void showImagePreview() {
         if(imageUri != null) {
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(),
+                bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(),
                                                                     imageUri);
                 Glide.with(this).load(bitmap).into(imgCapturaImagen);
             } catch (IOException e) {
@@ -150,11 +152,35 @@ public class MedicalAttentionFragment extends Fragment implements View.OnClickLi
             loadingProgressIndicator.setVisibility(View.GONE);
             return;
         }
+        // Llamado al api para guardar la imagen en el filesystem
+        if (bitmap != null) {
+            ImageUploader.uploadImage(bitmap, new ImageUploader.UploadCallBack() {
+                @Override
+                public void onSuccess(String imageUrl) {
+                    saveDB(nameHosts,
+                            namePets,
+                            typePets,
+                            razaPets,
+                            agePets,
+                            imageUrl);
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+    }
+
+    private void saveDB(String nameHosts, String namePets, String typePets, String razaPets, String agePets, String imageUrl) {
         AsistenciaMedicaModels asistencia = new AsistenciaMedicaModels(nameHosts,
                                                                         namePets,
                                                                         typePets,
                                                                         razaPets,
                                                                         agePets);
+        asistencia.setUrlImagen(imageUrl);
 
         db.collection("PACIENTES")
                 .add(asistencia)

@@ -15,6 +15,7 @@ public class AsistenciaMedicaModels {
     private String tipoMascota;
     private String razaMascota;
     private String EdadMascota;
+    private String urlImagen;
 
     public String getNombreDuenio() {
         return nombreDuenio;
@@ -54,5 +55,13 @@ public class AsistenciaMedicaModels {
 
     public void setEdadMascota(String edadMascota) {
         EdadMascota = edadMascota;
+    }
+
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
     }
 }
