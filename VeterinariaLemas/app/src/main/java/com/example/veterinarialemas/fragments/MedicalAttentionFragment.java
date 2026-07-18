@@ -19,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -228,6 +229,7 @@ public class MedicalAttentionFragment extends Fragment implements View.OnClickLi
         actTipoMascota.setText("");
         tieRazaMascota.setText("");
         tieEdadMascota.setText("");
+        imgCapturaImagen.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.upload_image));
     }
 
     private void cleanValuesWithError() {

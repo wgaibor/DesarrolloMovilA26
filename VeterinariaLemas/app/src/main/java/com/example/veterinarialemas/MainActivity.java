@@ -1,7 +1,11 @@
 package com.example.veterinarialemas;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.veterinarialemas.activity.MenuActivity;
+import com.example.veterinarialemas.notification.AppFirebaseMessagingService;
 import com.example.veterinarialemas.utils.SharedPreferencesManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,6 +49,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnIngresar = findViewById(R.id.btn_ingresar);
         btnIngresar.setOnClickListener(this);
         mAuth = FirebaseAuth.getInstance();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+         checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
+        }
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnSuccessListener( token -> {
+                    Log.d("FCM", "Token generado  "+token);
+                    AppFirebaseMessagingService.registerTokenInBackend(token);
+                });
     }
 
     @Override
