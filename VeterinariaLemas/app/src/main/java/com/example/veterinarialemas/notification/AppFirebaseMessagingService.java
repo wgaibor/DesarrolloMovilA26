@@ -30,6 +30,10 @@ public class AppFirebaseMessagingService extends FirebaseMessagingService {
         registerTokenInBackend(token);
     }
 
+    /**
+     * No olvidar cambiar la url que esta en la linea 41 debe ser la ip de su maquina.
+     * @param token
+     */
     public static void registerTokenInBackend(String token) {
         new Thread(() -> {
             try {
